@@ -12,6 +12,7 @@ import (
 type UserController interface {
     GetUserById(c *fiber.Ctx) error
     Register(c *fiber.Ctx) error
+    Login(c *fiber.Ctx) error
 }
 
 type userController struct {
@@ -75,6 +76,30 @@ func (ctl *userController) Register(c *fiber.Ctx) error {
 
     return c.JSON(fiber.Map{
         "data": user,
+    })
+}
+
+func (ctl *userController) Login(c *fiber.Ctx) error {
+    var login domain.UserLogin
+
+    if err := c.BodyParser(&login); err != nil {
+        c.Status(fiber.StatusBadRequest)
+        return c.JSON(fiber.Map{
+            "error": err.Error(),
+        })
+    }
+
+    token, err := ctl.userService.Login(login)
+
+    if err != nil {
+        c.Status(fiber.StatusBadRequest)
+        return c.JSON(fiber.Map{
+            "error": err.Error(),
+        })
+    }
+
+    return c.JSON(fiber.Map{
+        "data": token,
     })
 }
 

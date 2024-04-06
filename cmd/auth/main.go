@@ -58,6 +58,7 @@ func main() {
 
     authGroup := app.Group("/api/auth")
     authGroup.Post("/register", userController.Register)
+    authGroup.Post("/login", userController.Login)
 
     app.Listen(":3000")
 }

@@ -10,6 +10,7 @@ type UserService interface {
     GetUserById(id uint) (*domain.User, error)
     GetUserByEmail(email string) (*domain.User, error)
     RegisterUser(user domain.UserRegistration) (*domain.User, error)
+    Login(user domain.UserLogin) (*domain.User, error)
 }
 
 type userService struct {
@@ -59,5 +60,18 @@ func (us *userService) RegisterUser(user domain.UserRegistration) (*domain.User,
         LastName: user.LastName,
         Email: user.Email,
     }, nil
+}
+
+func (us *userService) Login(user domain.UserLogin) (*domain.User, error) {
+    userByEmail, err := us.userRepository.GetByEmail(user.Email)
+    if err != nil {
+        return nil, err
+    }
+
+    if userByEmail.Password != user.Password {
+        return nil, errors.New("invalid password")
+    }
+
+    return userByEmail, nil
 }
 
